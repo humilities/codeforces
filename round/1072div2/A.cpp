@@ -1,11 +1,9 @@
 #include <iostream>
 
 using namespace std;
-
-void solve()
 {
-	int n;
-	cin>>n;
+  int n;
+  cin>>n;
 
 	if(n==2) cout<<2<<endl;
 	else if(n==3) cout<<3<<endl;
@@ -19,14 +17,12 @@ int main()
 	cin.tie(NULL);
 
 	int t;
-	cin>>t;
 
 	while(t--)
 	{
 		solve();
-	}
+  }
 
-
-	return 0;
-
+  return 0;
 }
+
