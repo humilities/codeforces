@@ -1,6 +1,8 @@
 #include <iostream>
 
 using namespace std;
+
+void solve()
 {
   int n;
   cin>>n;
@@ -17,6 +19,7 @@ int main()
 	cin.tie(NULL);
 
 	int t;
+  cin>>t;
 
 	while(t--)
 	{
