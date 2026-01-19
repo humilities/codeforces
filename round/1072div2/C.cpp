@@ -19,6 +19,7 @@ void solve() {
 
   while (!q.empty()) {
     auto [curr, time] = q.front();
+    q.pop();
 
     if (curr < k)
       continue;
