@@ -3,42 +3,87 @@
 using namespace std;
 typedef long long ll;
 
-ll suba(int length) {
-  ll ret = 0;
+vector<int> pa;
+vector<int> rk;
+vector<int> sz;
 
-  for (int i = length; i > 0; i--) {
-    ret += length - (i - 1);
+int find(int v) {
+  if (v == pa[v])
+    return v;
+
+  return pa[v] = find(pa[v]);
+}
+
+ll cnt(int x) {
+  x = find(x);
+  return (ll)sz[x] * (sz[x] - 1) / 2;
+}
+
+void init(int v) {
+  pa[v] = v;
+  sz[v] = 1;
+  rk[v] = 0;
+}
+
+void un(int a, int b) {
+  a = find(a);
+  b = find(b);
+
+  if (a != b) {
+    if (rk[a] < rk[b])
+      swap(a, b);
+
+    pa[b] = a;
+    if (rk[a] == rk[b])
+      ++rk[a];
+
+    sz[a] += sz[b];
   }
-
-  return ret;
 }
 
 void solve() {
   int n;
   cin >> n;
 
-  vector<int> num(n);
+  map<int, vector<int>> m;
+  int num;
   for (int i = 0; i < n; i++) {
-    cin >> num[i];
+    int a;
+    cin >> a;
+
+    if (i > 0)
+      m[abs(a - num)].push_back(i);
+    num = a;
   }
 
-  vector<int> base(n - 1);
-  for (int i = 0; i < n - 1; i++) {
-    base[i] = abs(num[i + 1] - num[i]);
-  }
+  pa.resize(n);
+  rk.resize(n);
+  sz.resize(n);
 
-  queue<int> op;
-  vector<ll> ret(n);
-  for (int i = 1; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      if (base[j] > i)
-        op.push(base[j]);
+  for (int i = 0; i < n; i++)
+    init(i);
 
-      if (base[j + 1] < i) {
-        ret[i] += suba(op.size());
-      }
+  vector<ll> ans;
+  ll curr = 0;
+
+  for (int i = n - 1; i > 0; i--) {
+    for (auto s : m[i]) {
+      curr -= cnt(s);
+      curr -= cnt(s - 1);
+
+      un(s, s - 1);
+
+      curr += cnt(s);
     }
+
+    ans.push_back(curr);
   }
+
+  reverse(ans.begin(), ans.end());
+  for (auto x : ans)
+    cout << x << ' ';
+
+  cout << '\n';
 }
 
 int main() {
