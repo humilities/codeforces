@@ -10,8 +10,6 @@ void solve() {
   for (int i = 0; i < n; i++) {
     int num;
     cin >> num;
-
-    a[num]++;
   }
 
   if (a[0] == 0)
