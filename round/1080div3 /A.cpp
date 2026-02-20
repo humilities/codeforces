@@ -6,17 +6,21 @@ void solve() {
   int n;
   cin >> n;
 
+  bool is = true;
+
   for (int i = 0; i < n; i++) {
     int x;
     cin >> x;
 
     if (x == 67) {
-      cout << "YES" << endl;
-      return;
+      is = false;
     }
   }
 
-  cout << "NO" << endl;
+  if (is)
+    cout << "NO" << endl;
+  else
+    cout << "YES" << endl;
 
   return;
 }
