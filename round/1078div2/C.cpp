@@ -2,15 +2,7 @@
 
 using namespace std;
 
-void solve() {
-  int n, w;
-  cin >> n >> w;
-
-  int div = n / w;
-  int rem = n % w;
-
-  cout << div * (w - 1) + rem << endl;
-}
+void solve();
 
 int main() {
   ios_base::sync_with_stdio(false);
