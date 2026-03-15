@@ -4,16 +4,8 @@ using namespace std;
 typedef long long ll;
 
 void solve() {
-  ll p, q;
-  cin >> p >> q;
-
-  ll d = q - p;
-
-  if (d > 0 && p >= 2 * d && q >= 3 * d) {
-    cout << "Bob" << endl;
-  } else {
-    cout << "Alice" << endl;
-  }
+  ll x, y;
+  cin >> x >> y;
 }
 
 int main() {

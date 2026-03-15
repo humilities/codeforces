@@ -3,26 +3,30 @@
 using namespace std;
 
 void solve() {
-  int n;
-  cin >> n;
-  vector<int> p(n), a(n);
-  for (int &x : p)
-    cin >> x;
-  for (int &x : a)
-    cin >> x;
+  int n, k;
+  cin >> n >> k;
 
-  int pos = 0;
-  for (int i = 0; i < n; i++) {
-    while (pos < n && p[pos] != a[i]) {
-      pos++;
-    }
+  int p = 0;
+  while (1 << (p + 1) <= k) {
+    p++;
+  }
 
-    if (pos == n) {
-      cout << "NO" << endl;
-      return;
+  vector<int> ans;
+
+  for (int i = 0; i < 22; i++) {
+    if (i != p) {
+      ans.push_back(1 << i);
     }
   }
-  cout << "YES" << endl;
+
+  ans.push_back(k - pow(2, p));
+  ans.push_back(k + 1);
+  ans.push_back(pow(2, p) + k + 1);
+
+  cout << ans.size() << endl;
+  for (int i = 0; i < ans.size(); i++) {
+    cout << ans[i] << " \n"[i == ans.size() - 1];
+  }
 }
 
 int main() {

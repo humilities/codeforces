@@ -1,19 +1,14 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-typedef long long ll;
 
 void solve() {
-  ll p, q;
-  cin >> p >> q;
+  int n, k;
+  cin >> n >> k;
 
-  ll d = q - p;
-
-  if (d > 0 && p >= 2 * d && q >= 3 * d) {
-    cout << "Bob" << endl;
-  } else {
-    cout << "Alice" << endl;
-  }
+  vector<int> a(n);
+  for (int i = 0; i < n; i++)
+    cin >> a[i];
 }
 
 int main() {
