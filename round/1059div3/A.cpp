@@ -4,11 +4,18 @@ using namespace std;
 
 void solve() {
   int n;
+  int ma = 0;
   cin >> n;
 
   vector<int> a(n);
-  for (int i = 0; i < n; i++)
+  for (int i = 0; i < n; i++) {
     cin >> a[i];
+
+    if (a[i] > ma)
+      ma = a[i];
+  }
+
+  cout << ma << endl;
 }
 
 int main() {
