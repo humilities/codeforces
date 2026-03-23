@@ -2,24 +2,20 @@
 
 using namespace std;
 
-typedef long long ll;
-
 void solve() {
-  ll k, x;
-  cin >> k >> x;
+  int n, m, k;
+  cin >> n >> m >> k;
 
-  cout << (x << k) << "\n";
+  vector<int> a(n);
+  for (int i = 0; i < n; i++)
+    cin >> a[i];
 }
 
 int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
 
-  int t;
-  cin >> t;
+  solve();
 
-  while (t--) {
-    solve();
-  }
   return 0;
 }
