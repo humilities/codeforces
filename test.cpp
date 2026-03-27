@@ -1,42 +1,76 @@
 #include <bits/stdc++.h>
+
 using namespace std;
+using ll = long long;
+
+struct Part {
+  int low, high, id;
+};
+
+struct Actor {
+  int low, high, lim, id;
+};
+
+bool compp(const Part &x, const Part &y) { return x.low < y.low; }
+
+bool compa(const Actor &x, const Actor &y) { return x.low < y.low; }
 
 void solve() {
-  int n;
+  int n, m;
   cin >> n;
-  vector<int> a(n);
-  for (int i = 0; i < n; i++)
-    cin >> a[i];
 
-  // 为了快速统计后面相同元素的个数，我们从后往前遍历并记录频率
-  vector<int> ans(n);
-  map<int, int> freq; // 使用 map 处理大数值 a[i]
-
-  for (int i = n - 1; i >= 0; i--) {
-    int total_behind = n - 1 - i;      // i 之后的总元素个数
-    int same_behind = freq[abs(a[i])]; // i 之后与 a[i] 相同的个数
-
-    ans[i] = total_behind - same_behind;
-
-    // 更新频率表，供前面的元素使用
-    freq[abs(a[i])]++;
-  }
-
-  // 输出结果
+  vector<Part> ap(n);
   for (int i = 0; i < n; i++) {
-    cout << ans[i] << (i == n - 1 ? "" : " ");
+    cin >> ap[i].low >> ap[i].high;
+    ap[i].id = i;
   }
-  cout << endl;
+
+  cin >> m;
+  vector<Actor> aa(m);
+  for (int i = 0; i < m; i++) {
+    cin >> aa[i].low >> aa[i].high >> aa[i].lim;
+    aa[i].id = i + 1;
+  }
+
+  sort(ap.begin(), ap.end(), compp);
+  sort(aa.begin(), aa.end(), compa);
+
+  set<pair<int, int>> p;
+  vector<int> res(n);
+  int act = 0;
+
+  for (int i = 0; i < n; i++) {
+    while (act < m && aa[act].low <= ap[i].low) {
+      p.insert({aa[act].high, act});
+      act++;
+    }
+
+    auto it = p.lower_bound({ap[i].high, -1});
+
+    if (it == p.end()) {
+      cout << "NO" << endl;
+      return;
+    }
+
+    int idx = it->second;
+    res[ap[i].id] = aa[idx].id;
+
+    aa[idx].lim--;
+    if (aa[idx].lim == 0) {
+      p.erase(it);
+    }
+  }
+
+  cout << "YES" << endl;
+  for (int i = 0; i < n; i++) {
+    cout << res[i] << " \n"[i == n - 1];
+  }
 }
 
 int main() {
-  ios_base::sync_with_stdio(false);
+  ios::sync_with_stdio(false);
   cin.tie(NULL);
 
-  int t;
-  cin >> t;
-  while (t--) {
-    solve();
-  }
+  solve();
   return 0;
 }
