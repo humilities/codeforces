@@ -33,7 +33,7 @@ void solve() {
             int rem = cnt[i] - j - k - l;
             int ne = dp[pre][j][k] + l + (rem / 3);
 
-            dp[cur][j][k] = max(dp[cur][j][k], ne);
+            dp[cur][k][l] = max(dp[cur][k][l], ne);
           }
         }
       }
