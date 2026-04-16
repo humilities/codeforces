@@ -10,6 +10,18 @@ void solve() {
 
   vector<int> a(n);
   lin(i, 0, n) cin >> a[i];
+
+  ll sum = 0;
+  ll ma = 0;
+  lin(i, 0, n) {
+    ma = max(ma, (ll)a[i]);
+    sum += a[i];
+  }
+
+  ll tar = (sum + n - 2) / (n - 1);
+  ll x = max(tar, ma);
+
+  cout << x * (n - 1) - sum << "\n";
 }
 
 int main() {
