@@ -5,7 +5,11 @@ using namespace std;
 using ll = long long;
 
 void solve() {
-    
+    int n;
+    cin>>n;
+
+    string s1,s2;
+    cin>>s1>>s2;
 }
 
 int main() {
