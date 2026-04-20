@@ -2,54 +2,88 @@
 
 #define lin(i, a, b) for (int i = (a); i < (b); i++)
 using namespace std;
+using ll = long long;
 
-void solve() {
-    int n;
-    cin >> n;
+vector<int> mask;
+bool rea[66000];
 
-    vector<int> a(n);
-    lin(i, 0, n) cin >> a[i];
+void initb(){
+    lin(i,0,4){
+        int ma=0;
+        lin(j,0,4) ma|=(1<<(i*4+j));
 
-    sort(a.begin(), a.end(), greater<int>());
-
-    vector<int> res;
-    vector<bool> used(n, false);
-    bitset<20001> can;
-
-    can[0] = 1;
-
-    lin(j, 0, n) {
-        bool found = false;
-        lin(i, 0, n) {
-            if (!used[i] && !can[a[i]]) {
-                res.push_back(a[i]);
-                used[i] = true;
-                found = true;
-                
-                can |= (can << a[i]);
-                break;
-            }
-        }
-
-        if (!found) {
-            cout << -1 << "\n";
-            return;
-        }
+        mask.push_back(ma);
     }
 
-    lin(i, 0, n) cout << res[i] << (i == n - 1 ? "" : " ");
-    cout << "\n";
+    lin(j,0,4){
+        int ma=0;
+        lin(i,0,4) ma|=(1<<(i*4+j));
+
+        mask.push_back(ma);
+    }
+
+    lin(i,0,3){
+        lin(j,0,3){
+            int ma=0;
+            ma|=(1<<(i*4+j));
+            ma|=(1<<(i*4+j+1));
+            ma|=(1<<((i+1)*4+j));
+            ma|=(1<<((i+1)*4+j+1));
+
+            mask.push_back(ma);
+        }
+    }
+}
+
+void bfs(){
+    rea[0]=true;
+    queue<int> q;
+    q.push(0);
+
+    while(!q.empty()){
+        auto to=q.front();
+        q.pop();
+
+        for(auto ma:mask){
+            int ne=to^ma;
+            if(!rea[ne]){
+                rea[ne]=true;
+                q.push(ne);
+            }
+        }
+    }
+}
+
+int tob(string s){
+    int res=0;
+    lin(i,0,16) if(s[i]=='1') res|=(1<<i);
+
+    return res;
+}
+
+void solve() {
+    string s1,s2;
+    cin>>s1>>s2;
+
+    int tar1=tob(s1);
+    int tar2=tob(s2);
+
+    if(rea[tar1^tar2]) cout<<"Yes"<<"\n";
+    else cout<<"No"<<"\n";
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
+    initb();
+    bfs();
+
     int t;
     cin >> t;
 
-    while (t--) 
-      solve();
+    while (t--)
+        solve();
 
     return 0;
 }

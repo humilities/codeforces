@@ -5,7 +5,11 @@ using namespace std;
 using ll = long long;
 
 void solve() {
-    
+    int n;
+    cin>>n;
+
+    vector<int> b(n);
+    lin(i,0,n) cin>>b[i];
 }
 
 int main() {
