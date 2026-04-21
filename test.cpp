@@ -1,88 +1,114 @@
+// #include <bits/stdc++.h>
+
+// #define lin(i, a, b) for (int i = (a); i < (b); i++)
+// using namespace std;
+// using ll = long long;
+
+// const int mn=200005;
+// vector<int> ve(mn);
+
+// void solve() {
+//     string s;
+//     int cnt=0;
+
+//     while(cin>>s){
+//         if(s=="push"){
+//             int x;
+//             cin>>x;
+
+//             ve.push_back(x);
+//             cnt++;
+//         }else{
+//             int ans=0;
+//             int mid=(cnt+1)/2;
+//             cnt--;
+
+//             int idx=0;
+//             int i=0;
+//             while(idx<=mid){
+//                 if(ve[i]==0) {i++; continue;}
+//                 else{
+//                     ans=ve[i];
+
+//                     ve[i]=0;
+//                     idx++;
+//                     i++;
+//                 }
+//             }
+
+//             cout<<ans<<"\n";
+//         }
+//     }
+// }
+
+// int main() {
+//     ios_base::sync_with_stdio(false);
+//     cin.tie(NULL);
+
+//     //int t;
+//     //cin >> t;
+
+//     //while (t--)
+//         solve();
+
+//     return 0;
+// }
+
 #include <bits/stdc++.h>
 
 #define lin(i, a, b) for (int i = (a); i < (b); i++)
 using namespace std;
 using ll = long long;
 
-vector<int> mask;
-bool rea[66000];
+priority_queue<int> l;
+priority_queue<int,vector<int>,greater<int>> r;
 
-void initb(){
-    lin(i,0,4){
-        int ma=0;
-        lin(j,0,4) ma|=(1<<(i*4+j));
+void ba(int cnt){
+    int mid=(cnt+1)/2;
 
-        mask.push_back(ma);
+    while(l.size() > mid){
+        r.push(l.top());
+        l.pop();
     }
 
-    lin(j,0,4){
-        int ma=0;
-        lin(i,0,4) ma|=(1<<(i*4+j));
-
-        mask.push_back(ma);
+    while(l.size() < mid){
+        l.push(r.top());
+        r.pop();
     }
-
-    lin(i,0,3){
-        lin(j,0,3){
-            int ma=0;
-            ma|=(1<<(i*4+j));
-            ma|=(1<<(i*4+j+1));
-            ma|=(1<<((i+1)*4+j));
-            ma|=(1<<((i+1)*4+j+1));
-
-            mask.push_back(ma);
-        }
-    }
-}
-
-void bfs(){
-    rea[0]=true;
-    queue<int> q;
-    q.push(0);
-
-    while(!q.empty()){
-        auto to=q.front();
-        q.pop();
-
-        for(auto ma:mask){
-            int ne=to^ma;
-            if(!rea[ne]){
-                rea[ne]=true;
-                q.push(ne);
-            }
-        }
-    }
-}
-
-int tob(string s){
-    int res=0;
-    lin(i,0,16) if(s[i]=='1') res|=(1<<i);
-
-    return res;
 }
 
 void solve() {
-    string s1,s2;
-    cin>>s1>>s2;
+    string s;
+    int cnt=0;
 
-    int tar1=tob(s1);
-    int tar2=tob(s2);
+    while(cin>>s){
+        if(s=="push"){
+            int x;
+            cin>>x;
+            cnt++;
 
-    if(rea[tar1^tar2]) cout<<"Yes"<<"\n";
-    else cout<<"No"<<"\n";
+            if(l.empty() || x<=l.top()) l.push(x);
+            else r.push(x);
+
+            ba(cnt);
+        }else{
+            cout<<l.top()<<"\n";
+
+            l.pop();
+            cnt--;
+            ba(cnt);
+        }
+    }
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
-    initb();
-    bfs();
+    //int t;
+    //cin >> t;
 
-    int t;
-    cin >> t;
-
-    while (t--)
+    //while (t--)
         solve();
 
     return 0;
