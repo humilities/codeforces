@@ -1,49 +1,48 @@
-#include <bits/stdc++.h>
+#include <iostream>
 
-#define lin(i, a, b) for (int i = (a); i < (b); i++)
 using namespace std;
-using ll = long long;
 
-const int mod=998244353;
+typedef long long ll;
+const int MOD = 998244353;
 
-int ret(ll n){
-    if(n%4==0) return n;
-    else if(n%4==1) return 1;
-    else if(n%4==2) return n+1;
-    else return 0;
+ll count0(ll n) {
+    if (n < 0) return 0;
+    ll count = 1;
+    if (n >= 3) {
+        count += (n - 3) / 4 + 1;
+    }
+    return count;
+}
+
+ll count1(ll n) {
+    if (n < 1) return 0;
+    return (n - 1) / 4 + 1;
 }
 
 void solve() {
-    ll n,x;
-    cin>>n>>x;
+    ll n, x;
+    cin >> n >> x;
 
-    if(n==x){
-        cout<<0<<"\n";
-        return;
-    }
+    ll L0 = count0(x - 1);
+    ll L1 = count1(x - 1);
 
-    map<ll,ll> l;
-    map<ll,ll> r;
+    ll R0 = count0(n) - L0;
+    ll R1 = count1(n) - L1;
 
-    lin(i,1,x) l[ret(i)]++;
-    lin(i,x+1,n+1) r[ret(i)]++;
+    ll ans = ((L0 % MOD) * (R0 % MOD)) % MOD;
+    ans = (ans + (L1 % MOD) * (R1 % MOD)) % MOD;
 
-    ll ans=0;
-    for(auto& [val,cnt]:l)
-        ans=ans+cnt*r[val]%mod;
-
-    cout<<ans<<"\n";
+    cout << ans << "\n";
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
     int t;
     cin >> t;
-
-    while (t--)
+    while (t--) {
         solve();
-
+    }
     return 0;
 }
