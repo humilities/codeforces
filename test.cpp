@@ -4,40 +4,66 @@
 using namespace std;
 using ll = long long;
 
-const int mn=100005;
-const int lg=20;
-
-int st[mn][lg];
-int g[mn];
-
-void pre(int n,const vector<int>& a){
-    g[1]=0;
-    lin(i,2,n+1) g[i]=g[i/2]+1;
-
-    lin(i,1,n+1) st[i][0]=a[i-1];
-
-    lin(j,1,lg)
-        for(int i=1;i+(1<<j)-1<=n;i++) st[i][j]=st[i][j-1] | st[i+(1<<(j-1))][j-1];
-}
-
-int que(int l,int r){
-    int mid=g[r-l+1];
-    return st[l][mid] | st[r-(1<<mid)+1][mid];
-}
+struct card{
+    int id;
+    int tp;
+};
 
 void solve() {
-    int n,k;
-    cin>>n>>k;
+  int n,m;
+  cin>>n>>m; 
+  
+  vector<card> ca(n+1);
+  lin(i,1,n+1){
+    string s;
+    cin>>s;
 
-    vector<int> a(n);
-    lin(i,0,n) cin>>a[i];
+    ca[i].tp=s[0]-'A';
+    ca[i].id=stoi(s.substr(1));
+  }
 
-    pre(n,a);
-    int ans=0;
+  vector<vector<int>> cnt(m+1,vector<int>(5,0));
+  vector<int> co(m+1,0);
 
-    for(int i=1;i<=n-k+1;i++) ans=max(ans,que(i,i+k-1));
+  int num=0;
+  int len=n+1;
+  int al=1,ar=n;
 
-    cout<<ans<<"\n";
+  int l=1;
+  lin(r,1,n+1){
+    int id=ca[r].id;
+    int ty=ca[r].tp;
+
+    if(cnt[id][ty]==0){
+        co[id]++;
+
+        if(co[id]==5) num++;
+    }
+
+    cnt[id][ty]++;
+    while(num){
+        if(r-l+1<len){
+            len=r-l+1;
+            al=l;
+            ar=r;
+        }
+
+        int lid=ca[l].id;
+        int lty=ca[l].tp;
+
+        cnt[lid][lty]--;
+        if(cnt[lid][lty]==0){
+            if(co[lid]==5) num--;
+
+            co[lid]--;
+        }
+
+        l++;
+    }
+  }
+
+
+  cout<<al<<" "<<ar<<"\n";
 }
 
 int main() {
