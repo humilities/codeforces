@@ -4,57 +4,42 @@
 using namespace std;
 using ll = long long;
 
-bool che(ll mid,ll n,ll t,const vector<int>& a){
-    priority_queue<ll,vector<ll>,greater<ll>> co;
-    ll mn=0;
-
-    lin(i,0,mid){
-        co.push(a[i]);
-        mn=max(mn,(ll)a[i]);
-    }
-
-    lin(i,mid,n){
-        ll cur=co.top();
-        co.pop();
-
-        ll end=cur+a[i]+1;
-        mn=max(mn,end);
-
-        if(mn>t) return false;
-        co.push(end);
-    }
-
-    return mn<=t;
+ll f(int k,int hi,const vector<int>& c){
+    if(k==0) return 0;
+    if(c[k]==hi) return f(k-1,hi,c);
+    
+    return f(k-1,6-hi-c[k],c)+(1LL<<(k-1));
 }
 
+void solve() {
+    int n;
+    cin>>n;
 
-void solve(int n,ll t) {
-    vector<int> a(n);
-    lin(i,0,n) cin>>a[i];
+    vector<int> a(n+1),b(n+1);
+    lin(i,1,n+1) cin>>a[i];
+    lin(i,1,n+1) cin>>b[i];
 
-    ll l=1,r=n;
-    ll ans=n;
+    int k=n;
+    while(k && a[k]==b[k]) k--;
 
-    while(l<=r){
-        ll mid=l+(r-l)/2;
-        if(che(mid,n,t,a)){
-            ans=mid;
-            r=mid-1;
-        }else l=mid+1;
+    if(k==0){
+        cout<<0<<"\n";
+        return;
     }
 
-    cout<<ans<<"\n";
+    int hi=6-a[k]-b[k];
+    cout<<f(k-1,hi,a)+1+f(k-1,hi,b)<<"\n";
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
-   int n;
-   ll t;
+    int t;
+    cin >> t;
 
-   while(cin>>n>>t)
-        solve(n,t);
+    while (t--)
+        solve();
 
     return 0;
 }
