@@ -4,77 +4,57 @@
 using namespace std;
 using ll = long long;
 
-struct card{
-    int id;
-    int tp;
-};
+bool che(ll mid,ll n,ll t,const vector<int>& a){
+    priority_queue<ll,vector<ll>,greater<ll>> co;
+    ll mn=0;
 
-void solve() {
-  int n,m;
-  cin>>n>>m; 
-  
-  vector<card> ca(n+1);
-  lin(i,1,n+1){
-    string s;
-    cin>>s;
-
-    ca[i].tp=s[0]-'A';
-    ca[i].id=stoi(s.substr(1));
-  }
-
-  vector<vector<int>> cnt(m+1,vector<int>(5,0));
-  vector<int> co(m+1,0);
-
-  int num=0;
-  int len=n+1;
-  int al=1,ar=n;
-
-  int l=1;
-  lin(r,1,n+1){
-    int id=ca[r].id;
-    int ty=ca[r].tp;
-
-    if(cnt[id][ty]==0){
-        co[id]++;
-
-        if(co[id]==5) num++;
+    lin(i,0,mid){
+        co.push(a[i]);
+        mn=max(mn,(ll)a[i]);
     }
 
-    cnt[id][ty]++;
-    while(num){
-        if(r-l+1<len){
-            len=r-l+1;
-            al=l;
-            ar=r;
-        }
+    lin(i,mid,n){
+        ll cur=co.top();
+        co.pop();
 
-        int lid=ca[l].id;
-        int lty=ca[l].tp;
+        ll end=cur+a[i]+1;
+        mn=max(mn,end);
 
-        cnt[lid][lty]--;
-        if(cnt[lid][lty]==0){
-            if(co[lid]==5) num--;
-
-            co[lid]--;
-        }
-
-        l++;
+        if(mn>t) return false;
+        co.push(end);
     }
-  }
+
+    return mn<=t;
+}
 
 
-  cout<<al<<" "<<ar<<"\n";
+void solve(int n,ll t) {
+    vector<int> a(n);
+    lin(i,0,n) cin>>a[i];
+
+    ll l=1,r=n;
+    ll ans=n;
+
+    while(l<=r){
+        ll mid=l+(r-l)/2;
+        if(che(mid,n,t,a)){
+            ans=mid;
+            r=mid-1;
+        }else l=mid+1;
+    }
+
+    cout<<ans<<"\n";
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
-    //int t;
-    //cin >> t;
+   int n;
+   ll t;
 
-    //while (t--)
-        solve();
+   while(cin>>n>>t)
+        solve(n,t);
 
     return 0;
 }
