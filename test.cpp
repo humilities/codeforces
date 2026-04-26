@@ -4,42 +4,34 @@
 using namespace std;
 using ll = long long;
 
-ll f(int k,int hi,const vector<int>& c){
-    if(k==0) return 0;
-    if(c[k]==hi) return f(k-1,hi,c);
-    
-    return f(k-1,6-hi-c[k],c)+(1LL<<(k-1));
-}
+void solve(string s) {
+    int n=s.length();
+    ll ans=0;
+    vector<ll> cnt(26,0),su(26,0);
 
-void solve() {
-    int n;
-    cin>>n;
+    lin(i,0,n){
+        int num=s[i]-'a';
 
-    vector<int> a(n+1),b(n+1);
-    lin(i,1,n+1) cin>>a[i];
-    lin(i,1,n+1) cin>>b[i];
+        if(cnt[num]) ans+=cnt[num]*(i+1)-su[num];
 
-    int k=n;
-    while(k && a[k]==b[k]) k--;
-
-    if(k==0){
-        cout<<0<<"\n";
-        return;
+        cnt[num]++;
+        su[num]+=i;
     }
 
-    int hi=6-a[k]-b[k];
-    cout<<f(k-1,hi,a)+1+f(k-1,hi,b)<<"\n";
+    cout<<ans<<"\n";
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int t;
-    cin >> t;
+    //int t;
+    //cin >> t;
 
-    while (t--)
-        solve();
+    //while (t--)
+    string s;
+    while(cin>>s)
+        solve(s);
 
     return 0;
 }
