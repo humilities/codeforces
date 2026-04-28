@@ -7,6 +7,8 @@ using ll = long long;
 void solve() {
     int m,s,t;
     cin>>m>>s>>t;
+
+    //this is a test for unrelated merge
 }
 
 int main() {
