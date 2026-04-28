@@ -1,3 +1,16 @@
+# 编译产物
 bin/
+*.exe
 *.o
+*.obj
+*.pdb
+*.ilk
+
+# VS Code 相关
 .vscode/
+
+# 常见的 Windows 临时文件
+[Dd]ebug/
+[Rr]elease/
+Thumbs.db
+.DS_Store
