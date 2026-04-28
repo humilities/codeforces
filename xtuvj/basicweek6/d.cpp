@@ -5,7 +5,8 @@ using namespace std;
 using ll = long long;
 
 void solve() {
-    
+    int m,s,t;
+    cin>>m>>s>>t;
 }
 
 int main() {
