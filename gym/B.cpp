@@ -5,10 +5,10 @@ using namespace std;
 using ll = long long;
 
 void solve() {
-  int n;
-  cin >> n;
+  int n, m;
+  cin >> n >> m;
 
-  vector<int> a(n);
+  vector<string> a(n);
   lin(i, 0, n) cin >> a[i];
 }
 
