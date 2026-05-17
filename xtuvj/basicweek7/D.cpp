@@ -8,13 +8,43 @@ void solve() {
   int n;
   cin >> n;
 
+  ll sum = 0;
   vector<int> a(n);
-  lin(i, 0, n) cin >> a[i];
+  lin(i, 0, n) cin >> a[i], sum += a[i];
 
-  if (n & 1) {
-    cout << "NO" << "\n";
-    return;
+  priority_queue<ll> q;
+  q.push(sum);
+
+  multiset<ll> m;
+  lin(i, 0, n) m.insert(a[i]);
+
+  while (!q.empty()) {
+    auto cur = q.top();
+    q.pop();
+
+    if (m.find(cur) != m.end()) {
+      m.erase(m.find(cur));
+    } else if (m.find(cur) == m.end() && cur != 1) {
+      ll l = (cur + 1) / 2;
+      ll r = (cur) / 2;
+
+      q.push(l);
+      q.push(r);
+    } else {
+      cout << "NO" << "\n";
+      return;
+    }
+
+    if (q.size() > m.size()) {
+      cout << "NO" << "\n";
+      return;
+    }
   }
+
+  if (m.size() == 0)
+    cout << "YES" << "\n";
+  else
+    cout << "NO" << "\n";
 }
 
 int main() {
