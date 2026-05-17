@@ -10,6 +10,11 @@ void solve() {
 
   vector<int> a(n);
   lin(i, 0, n) cin >> a[i];
+
+  if (n & 1) {
+    cout << "NO" << "\n";
+    return;
+  }
 }
 
 int main() {
