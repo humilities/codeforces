@@ -4,7 +4,13 @@
 using namespace std;
 using ll = long long;
 
-void solve() {}
+void solve() {
+  int n, q;
+  cin >> n >> q;
+
+  vector<int> a(n);
+  lin(i, 0, n) cin >> a[i];
+}
 
 int main() {
   ios_base::sync_with_stdio(false);
