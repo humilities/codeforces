@@ -8,15 +8,41 @@ void solve() {
   int n, q;
   cin >> n >> q;
 
-  vector<int> a(n);
-  lin(i, 0, n) cin >> a[i];
+  vector<int> a(n + 1);
+  lin(i, 1, n + 1) cin >> a[i];
 
-  map<int, int> sco;
-  vector<int> ed(n);
-  ed[0] = n;
+  vector<vector<int>> win(n + 1);
+  deque<int> dq;
+  lin(i, 1, n + 1) dq.push_back(i);
 
-  int m = n - 1;
-  while (m--) {
+  lin(i, 1, n + 1) {
+    auto t1 = dq.front();
+    dq.pop_front();
+    auto t2 = dq.front();
+    dq.pop_front();
+
+    if (a[t1] > a[t2]) {
+      win[t1].push_back(i);
+      dq.push_front(t1);
+      dq.push_back(t2);
+    } else {
+      win[t2].push_back(i);
+      dq.push_front(t2);
+      dq.push_back(t1);
+    }
+  }
+
+  while (q--) {
+    int i, k;
+    cin >> i >> k;
+
+    auto th = upper_bound(win[i].begin(), win[i].end(), k);
+    int cnt = distance(win[i].begin(), th);
+
+    if (a[i] == n && k > n)
+      cnt += (k - n);
+
+    cout << cnt << "\n";
   }
 }
 
