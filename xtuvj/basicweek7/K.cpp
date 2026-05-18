@@ -10,6 +10,14 @@ void solve() {
 
   vector<int> a(n);
   lin(i, 0, n) cin >> a[i];
+
+  map<int, int> sco;
+  vector<int> ed(n);
+  ed[0] = n;
+
+  int m = n - 1;
+  while (m--) {
+  }
 }
 
 int main() {
