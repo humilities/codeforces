@@ -24,7 +24,7 @@ void solve() {
   dp[0] = 0;
   dp[1] = cnt[1];
 
-  lin(i, 2, mv + 1) dp[i] = max(dp[i - 1], dp[i - 2] + i * cnt[i]);
+  lin(i, 2, mv + 1) dp[i] = max(dp[i - 1], dp[i - 2] + 1LL * i * cnt[i]);
 
   cout << dp[mv] << "\n";
 }
