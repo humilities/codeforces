@@ -7,6 +7,13 @@ using ll = long long;
 void solve() {
   int type, n, m, p;
   cin >> type >> n >> m >> p;
+
+  ll ans = 1;
+  ll sta = n - m + 1;
+
+  lin(i, 0, m) ans = ans * (sta - i) % p;
+
+  cout << ans;
 }
 
 int main() {
