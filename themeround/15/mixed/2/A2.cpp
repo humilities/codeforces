@@ -4,7 +4,15 @@
 using namespace std;
 using ll = long long;
 
-void solve() {}
+void solve() {
+  int n, m, k;
+  cin >> n >> m >> k;
+
+  if (n - (n + m - 1) / m > k)
+    cout << "YES" << "\n";
+  else
+    cout << "NO" << "\n";
+}
 
 int main() {
   ios_base::sync_with_stdio(false);
