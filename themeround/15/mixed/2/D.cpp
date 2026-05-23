@@ -15,14 +15,12 @@ int main() {
   for (char c = 'a'; c <= 'z'; c++) {
     int min_i = -1, max_ss = -1;
 
-    // leftmost in S[1..n-1]
     for (int i = 1; i < n; i++) {
       if (S[i] == c) {
         min_i = i;
         break;
       }
     }
-    // rightmost in T[0..m-2]
     for (int ss = m - 2; ss >= 0; ss--) {
       if (T[ss] == c) {
         max_ss = ss;
