@@ -1,15 +1,14 @@
 #include <bits/stdc++.h>
 
-#define lin(i, a, b) for (int i = (a); i < (b); i++)
 using namespace std;
 using ll = long long;
 
-const int mod = 1e7 + 9;
-const int mn = 1e6;
+const int mod = 1e9 + 7;
+const int mn = 1e6 + 5;
 
-int dp[mn];
-ll fav[mn];
-ll invfav[mn];
+ll fac[mn];
+ll invfac[mn];
+ll d[mn];
 
 ll power(ll base, ll exp) {
   ll res = 1;
@@ -17,41 +16,45 @@ ll power(ll base, ll exp) {
 
   while (exp) {
     if (exp & 1)
-      res = (res * base) % mod;
+      res = res * base % mod;
 
-    base *= base;
+    base = base * base % mod;
     exp >>= 1;
   }
 
-  return base;
+  return res;
 }
 
-ll iv(ll num) { return power(num, mod - 2); }
-
 void pre() {
-  dp[0] = 0;
-  dp[1] = 1;
+  d[0] = 1, d[1] = 0;
+  for (int i = 2; i < mn; i++)
+    d[i] = (i - 1) % mod * ((d[i - 1] + d[i - 2]) % mod) % mod;
 
-  for (int i = 2; i <= mn; i++)
-    dp[i] = (i - 1) % mod * (dp[i - 1] + dp[i - 2]);
-  for (int i = 1; i <= mn; i++)
-    fav[i] = fav[i - 1] % mod * i;
+  fac[0] = 1;
+  for (int i = 1; i < mn; i++)
+    fac[i] = i % mod * fac[i - 1] % mod;
+
+  invfac[mn - 1] = power(fac[mn - 1], mod - 2);
+  for (int i = mn - 2; i >= 0; i--)
+    invfac[i] = invfac[i + 1] % mod * (i + 1) % mod;
 }
 
 ll C(ll n, ll k) {
-  return fav[n] % mod * invfav[n - k] % mod * invfav[k] % mod;
+  if (k < 0 || k > n)
+    return 0;
+  return fac[n] % mod * invfac[k] % mod * invfac[n - k] % mod;
 }
 
 void solve() {
   int n, m;
   cin >> n >> m;
 
-  ll ans = 0;
-  for (int i = 0; i < n; i++) {
-    ans += C(n, i) * dp[i] % mod;
+  if (m > n) {
+    cout << 0 << "\n";
+    return;
   }
 
-  cout << ans << "\n";
+  cout << C(n, m) * d[n - m] % mod << "\n";
 }
 
 int main() {
