@@ -1,0 +1,13 @@
+CompileFlags:
+  Add:
+    - --target=x86_64-w64-mingw32
+    - -std=c++23
+    - "-IC:/Program Files/Mingw/mingw64/include/c++/15.2.0"
+    - "-IC:/Program Files/Mingw/mingw64/include/c++/15.2.0/x86_64-w64-mingw32"
+    - "-IC:/Program Files/Mingw/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include"
+    - "-IC:/Program Files/Mingw/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include-fixed"
+    - "-IC:/Program Files/Mingw/mingw64/x86_64-w64-mingw32/include"
+  Compiler: g++
+Diagnostics:
+  Suppress: "*"
+  UnusedIncludes: None
