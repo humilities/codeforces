@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据库规范化工具</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #0f1117;
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+/* ===== HEADER ===== */
+.header {
+  background: linear-gradient(135deg, #1a1d2e 0%, #16213e 100%);
+  border-bottom: 1px solid #2d3561;
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.header-icon {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, #4f8ef7, #7c3aed);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+}
+.header h1 { font-size: 22px; font-weight: 700; color: #f0f4ff; }
+.header p  { font-size: 13px; color: #8892b0; margin-top: 2px; }
+
+/* ===== LAYOUT ===== */
+.container { display: flex; height: calc(100vh - 89px); }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 220px; flex-shrink: 0;
+  background: #13151f;
+  border-right: 1px solid #1e2235;
+  padding: 20px 12px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.nav-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #8892b0;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  width: 100%;
+}
+.nav-btn:hover { background: #1e2235; color: #c9d1e9; }
+.nav-btn.active { background: #1e2a4a; color: #4f8ef7; }
+.nav-btn .num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #2d3561;
+  font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+  color: #8892b0;
+  flex-shrink: 0;
+}
+.nav-btn.active .num { background: #1a3a6a; color: #4f8ef7; }
+.nav-divider { height: 1px; background: #1e2235; margin: 8px 4px; }
+
+/* ===== MAIN PANEL ===== */
+.main { flex: 1; overflow-y: auto; padding: 28px 36px; }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.section-title {
+  font-size: 20px; font-weight: 700; color: #f0f4ff;
+  margin-bottom: 6px;
+}
+.section-desc { font-size: 13px; color: #8892b0; margin-bottom: 24px; line-height: 1.6; }
+
+/* ===== INPUT AREA ===== */
+.input-group { margin-bottom: 20px; }
+.input-group label {
+  display: block; font-size: 12px; font-weight: 600;
+  color: #64748b; text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+.input-group input, .input-group textarea {
+  width: 100%;
+  background: #1a1d2e;
+  border: 1px solid #2d3561;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #e2e8f0;
+  font-family: 'Courier New', monospace;
+  outline: none;
+  transition: border-color 0.15s;
+  resize: vertical;
+}
+.input-group input:focus, .input-group textarea:focus {
+  border-color: #4f8ef7;
+  box-shadow: 0 0 0 3px rgba(79,142,247,0.1);
+}
+.input-group textarea { min-height: 100px; }
+.input-hint { font-size: 11px; color: #4a5568; margin-top: 5px; }
+
+/* ===== BUTTONS ===== */
+.btn-row { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+.btn {
+  padding: 9px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #4f8ef7, #3b72d9);
+  color: #fff;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79,142,247,0.35); }
+.btn-secondary {
+  background: #1e2235;
+  color: #8892b0;
+  border: 1px solid #2d3561;
+}
+.btn-secondary:hover { background: #252840; color: #c9d1e9; }
+.btn-danger {
+  background: #2a1a1a;
+  color: #fc8181;
+  border: 1px solid #4a2020;
+}
+.btn-danger:hover { background: #3a1a1a; }
+
+/* ===== FD LIST ===== */
+.fd-list { margin-bottom: 20px; }
+.fd-item {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #1a1d2e;
+  border: 1px solid #2d3561;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: #a8b8e8;
+}
+.fd-item .fd-del {
+  background: none; border: none; cursor: pointer;
+  color: #4a5568; font-size: 16px; padding: 0 4px;
+  transition: color 0.15s;
+}
+.fd-item .fd-del:hover { color: #fc8181; }
+.fd-left { color: #7ee8a2; }
+.fd-arrow { color: #4f8ef7; margin: 0 8px; }
+.fd-right { color: #f6c90e; }
+
+/* ===== RESULT BOX ===== */
+.result-box {
+  background: #13151f;
+  border: 1px solid #2d3561;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.result-header {
+  background: #1a1d2e;
+  padding: 12px 18px;
+  font-size: 12px; font-weight: 700;
+  color: #4f8ef7; text-transform: uppercase; letter-spacing: 0.08em;
+  border-bottom: 1px solid #2d3561;
+  display: flex; align-items: center; gap: 8px;
+}
+.result-body { padding: 16px 18px; }
+.result-step {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #1e2235;
+}
+.result-step:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.step-label {
+  font-size: 11px; font-weight: 700;
+  color: #4a5568; text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+.step-content { font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.7; color: #c9d1e9; }
+.step-content .hl-left  { color: #7ee8a2; }
+.step-content .hl-arrow { color: #4f8ef7; }
+.step-content .hl-right { color: #f6c90e; }
+.step-content .hl-key   { color: #f6a623; }
+.step-content .hl-rel   { color: #c678dd; }
+.step-content .hl-op    { color: #4f8ef7; font-weight: 700; }
+.step-content .hl-bad   { color: #fc8181; }
+.step-content .hl-good  { color: #7ee8a2; }
+.step-content .hl-note  { color: #8892b0; font-style: italic; }
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px; font-weight: 700;
+}
+.badge-ok   { background: #1a3a2a; color: #7ee8a2; }
+.badge-fail { background: #3a1a1a; color: #fc8181; }
+.badge-info { background: #1a2a4a; color: #4f8ef7; }
+
+/* ===== TABS ===== */
+.tab-row {
+  display: flex; gap: 0;
+  border-bottom: 1px solid #2d3561;
+  margin-bottom: 20px;
+}
+.tab {
+  padding: 8px 16px;
+  font-size: 13px; font-weight: 500;
+  color: #8892b0;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+}
+.tab.active { color: #4f8ef7; border-bottom-color: #4f8ef7; }
+.tab:hover:not(.active) { color: #c9d1e9; }
+
+/* ===== ALGO BOX ===== */
+.algo-box {
+  background: #1a1d2e;
+  border: 1px solid #2d3561;
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #8892b0;
+  line-height: 1.8;
+}
+.algo-box .kw { color: #c678dd; }
+.algo-box .fn { color: #4f8ef7; }
+.algo-box .cm { color: #4a5568; }
+.algo-box .va { color: #7ee8a2; }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0f1117; }
+::-webkit-scrollbar-thumb { background: #2d3561; border-radius: 3px; }
+
+/* ===== SHARED STATE BADGE ===== */
+.shared-schema {
+  background: #1a2a4a;
+  border: 1px solid #2d3561;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px; color: #4f8ef7;
+  margin-bottom: 18px;
+  font-family: 'Courier New', monospace;
+  display: none;
+}
+.shared-schema.visible { display: block; }
+
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: #4a5568;
+  font-size: 14px;
+}
+.empty-state .es-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">🗄️</div>
+  <div>
+    <h1>数据库规范化工具</h1>
+    <p>属性闭包 · 正则覆盖 · BCNF判定 · 3NF分解 · BCNF分解 · 函数依赖保持</p>
+  </div>
+</div>
+
+<div class="container">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <button class="nav-btn active" onclick="showPanel('setup')">
+      <span class="num">⚙</span> 输入模式 &amp; FD
+    </button>
+    <div class="nav-divider"></div>
+    <button class="nav-btn" onclick="showPanel('closure')">
+      <span class="num">1</span> 属性闭包
+    </button>
+    <button class="nav-btn" onclick="showPanel('canonical')">
+      <span class="num">2</span> 正则覆盖
+    </button>
+    <button class="nav-btn" onclick="showPanel('bcnf_check')">
+      <span class="num">3</span> BCNF 判定
+    </button>
+    <button class="nav-btn" onclick="showPanel('threenf')">
+      <span class="num">4</span> 3NF 分解
+    </button>
+    <button class="nav-btn" onclick="showPanel('bcnf_decomp')">
+      <span class="num">5</span> BCNF 分解
+    </button>
+    <button class="nav-btn" onclick="showPanel('preserve')">
+      <span class="num">6</span> 依赖保持
+    </button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ===== SETUP ===== -->
+    <div class="panel active" id="panel-setup">
+      <div class="section-title">📥 输入模式与函数依赖</div>
+      <div class="section-desc">在此定义关系模式 R 和函数依赖集 F，所有算法共享此输入。属性用大写字母表示。</div>
+
+      <div class="input-group">
+        <label>关系模式 R（属性集）</label>
+        <input type="text" id="schema-input" placeholder="例如: ABCDE" value="ABCDE" oninput="syncSchema()">
+        <div class="input-hint">输入若干大写字母，每个字母代表一个属性</div>
+      </div>
+
+      <div class="input-group">
+        <label>添加函数依赖</label>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" id="fd-left"  placeholder="左侧 (如: AB)" style="width:130px;">
+          <span style="color:#4f8ef7; font-size:18px; font-weight:700;">→</span>
+          <input type="text" id="fd-right" placeholder="右侧 (如: C)" style="width:130px;">
+          <button class="btn btn-primary" onclick="addFD()">添加</button>
+        </div>
+        <div class="input-hint">例如: A→BC，CD→E，B→D</div>
+      </div>
+
+      <div class="fd-list" id="fd-list"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="loadExample(1)">示例1: ABCDE / A→BC, CD→E, B→D, E→A</button>
+        <button class="btn btn-secondary" onclick="loadExample(2)">示例2: ABCD / A→B, B→C, C→D, D→A</button>
+        <button class="btn btn-danger"    onclick="clearAll()">清空</button>
+      </div>
+
+      <div id="candidate-keys-box" class="result-box" style="display:none;">
+        <div class="result-header">🔑 候选键</div>
+        <div class="result-body" id="candidate-keys-body"></div>
+      </div>
+    </div>
+
+    <!-- ===== CLOSURE ===== -->
+    <div class="panel" id="panel-closure">
+      <div class="section-title">🔍 属性闭包计算</div>
+      <div class="section-desc">给定属性集 A，计算 A 在函数依赖集 F 下的闭包 A⁺——即 A 能函数决定的所有属性集合。</div>
+
+      <div id="shared-info-closure" class="shared-schema"></div>
+
+      <div class="algo-box">
+        <span class="cm">// 属性闭包算法</span><br>
+        <span class="kw">result</span> ← A<br>
+        <span class="kw">while</span>(<span class="va">result</span> 有变化) {<br>
+        &nbsp;&nbsp;<span class="kw">for_each</span> f ∈ F:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>(f.left ⊆ <span class="va">result</span>):<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="va">result</span> = <span class="va">result</span> ∪ f.right<br>
+        }<br>
+        <span class="kw">return</span> <span class="va">result</span>
+      </div>
+
+      <div class="input-group">
+        <label>查询属性集 A</label>
+        <input type="text" id="closure-input" placeholder="例如: AB" oninput="computeClosure()">
+      </div>
+      <div id="closure-result"></div>
+    </div>
+
+    <!-- ===== CANONICAL ===== -->
+    <div class="panel" id="panel-canonical">
+      <div class="section-title">✂️ 正则覆盖（Canonical Cover）</div>
+      <div class="section-desc">去除函数依赖集 F 中的冗余，得到等价的最小覆盖 F<sub>c</sub>，满足：无无关属性、无冗余FD、右侧为单属性。</div>
+      <div id="shared-info-canonical" class="shared-schema"></div>
+      <button class="btn btn-primary" onclick="runCanonical()">▶ 计算正则覆盖</button>
+      <div id="canonical-result" style="margin-top:20px;"></div>
+    </div>
+
+    <!-- ===== BCNF CHECK ===== -->
+    <div class="panel" id="panel-bcnf_check">
+      <div class="section-title">⚖️ BCNF 判定</div>
+      <div class="section-desc">检验模式 R 在 F 上是否满足 BCNF：对所有非平凡 α→β ∈ F⁺，α 必须是 R 的超键。</div>
+      <div id="shared-info-bcnf_check" class="shared-schema"></div>
+
+      <div class="tab-row">
+        <div class="tab active" id="tab-simple" onclick="switchBcnfTab('simple')">简单判定（原始F）</div>
+        <div class="tab" id="tab-decomp" onclick="switchBcnfTab('decomp')">分解后判定</div>
+      </div>
+
+      <div id="bcnf-simple-area">
+        <button class="btn btn-primary" onclick="runBcnfSimple()">▶ 判定当前模式</button>
+        <div id="bcnf-simple-result" style="margin-top:20px;"></div>
+      </div>
+
+      <div id="bcnf-decomp-area" style="display:none;">
+        <div class="section-desc" style="margin-bottom:12px;">输入分解后的子模式（每行一个）：</div>
+        <div class="input-group">
+          <label>子模式列表</label>
+          <textarea id="decomp-input" placeholder="每行一个子模式&#10;例如:&#10;AB&#10;BCD&#10;ACD"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="runBcnfDecomp()">▶ 判定各子模式</button>
+        <div id="bcnf-decomp-result" style="margin-top:20px;"></div>
+      </div>
+    </div>
+
+    <!-- ===== 3NF ===== -->
+    <div class="panel" id="panel-threenf">
+      <div class="section-title">🔀 3NF 分解</div>
+      <div class="section-desc">将模式 R 分解为满足3NF的子模式集合，保证：无损连接 + 函数依赖保持。</div>
+      <div id="shared-info-threenf" class="shared-schema"></div>
+      <button class="btn btn-primary" onclick="runThreeNF()">▶ 执行3NF分解</button>
+      <div id="threenf-result" style="margin-top:20px;"></div>
+    </div>
+
+    <!-- ===== BCNF DECOMP ===== -->
+    <div class="panel" id="panel-bcnf_decomp">
+      <div class="section-title">⚡ BCNF 分解</div>
+      <div class="section-desc">将模式 R 递归分解为满足BCNF的子模式集合，保证无损连接（但可能丢失函数依赖）。</div>
+      <div id="shared-info-bcnf_decomp" class="shared-schema"></div>
+      <button class="btn btn-primary" onclick="runBcnfDecomposition()">▶ 执行BCNF分解</button>
+      <div id="bcnf-decomp-main-result" style="margin-top:20px;"></div>
+    </div>
+
+    <!-- ===== PRESERVE ===== -->
+    <div class="panel" id="panel-preserve">
+      <div class="section-title">🔗 函数依赖保持检验</div>
+      <div class="section-desc">验证分解后的子模式集合 RS 是否保持了 F 中的每个函数依赖。</div>
+      <div id="shared-info-preserve" class="shared-schema"></div>
+      <div class="input-group">
+        <label>分解后的子模式（每行一个）</label>
+        <textarea id="preserve-decomp" placeholder="每行一个子模式&#10;例如:&#10;ABC&#10;BD&#10;CDE"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="runPreserve()">▶ 检验依赖保持</button>
+      <div id="preserve-result" style="margin-top:20px;"></div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /container -->
+
+<script>
+// ========== GLOBAL STATE ==========
+let schemaStr = 'ABCDE';
+let fds = [];  // [{left: Set, right: Set, str: string}]
+
+// ========== NAVIGATION ==========
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  updateSharedInfo(name);
+}
+
+function updateSharedInfo(name) {
+  const ids = ['closure','canonical','bcnf_check','threenf','bcnf_decomp','preserve'];
+  ids.forEach(id => {
+    const el = document.getElementById('shared-info-' + id);
+    if (!el) return;
+    el.textContent = `R = {${schemaStr}}   |   F 包含 ${fds.length} 个函数依赖`;
+    el.className = 'shared-schema' + (fds.length > 0 ? ' visible' : '');
+  });
+}
+
+// ========== SETUP ==========
+function syncSchema() {
+  schemaStr = document.getElementById('schema-input').value.replace(/[^A-Z]/g,'').split('').sort().filter((v,i,a)=>a.indexOf(v)===i).join('');
+  document.getElementById('schema-input').value = schemaStr;
+  renderFDList();
+  showCandidateKeys();
+}
+
+function addFD() {
+  const l = document.getElementById('fd-left').value.toUpperCase().replace(/[^A-Z]/g,'');
+  const r = document.getElementById('fd-right').value.toUpperCase().replace(/[^A-Z]/g,'');
+  if (!l || !r) { alert('请填写左侧和右侧属性'); return; }
+  const lset = new Set(l), rset = new Set(r);
+  fds.push({ left: lset, right: rset, str: `${[...lset].sort().join('')} → ${[...rset].sort().join('')}` });
+  document.getElementById('fd-left').value = '';
+  document.getElementById('fd-right').value = '';
+  renderFDList();
+  showCandidateKeys();
+}
+
+function deleteFD(i) {
+  fds.splice(i, 1);
+  renderFDList();
+  showCandidateKeys();
+}
+
+function renderFDList() {
+  const el = document.getElementById('fd-list');
+  if (fds.length === 0) { el.innerHTML = ''; return; }
+  el.innerHTML = fds.map((fd, i) => `
+    <div class="fd-item">
+      <span>
+        <span class="fd-left">${[...fd.left].sort().join('')}</span>
+        <span class="fd-arrow">→</span>
+        <span class="fd-right">${[...fd.right].sort().join('')}</span>
+      </span>
+      <button class="fd-del" onclick="deleteFD(${i})" title="删除">×</button>
+    </div>`).join('');
+}
+
+function clearAll() {
+  fds = [];
+  renderFDList();
+  document.getElementById('fd-list').innerHTML = '';
+  document.getElementById('candidate-keys-box').style.display = 'none';
+}
+
+function loadExample(n) {
+  clearAll();
+  if (n === 1) {
+    schemaStr = 'ABCDE';
+    document.getElementById('schema-input').value = schemaStr;
+    [['AB','C'],['C','A'],['BC','D'],['ACD','B'],['D','E'],['BE','C']].forEach(([l,r])=>{
+      fds.push({left:new Set(l),right:new Set(r),str:`${[...new Set(l)].sort().join('')} → ${[...new Set(r)].sort().join('')}`});
+    });
+  } else {
+    schemaStr = 'ABCDE';
+    document.getElementById('schema-input').value = schemaStr;
+    [['A','BC'],['CD','E'],['B','D'],['E','A']].forEach(([l,r])=>{
+      fds.push({left:new Set(l),right:new Set(r),str:`${[...new Set(l)].sort().join('')} → ${[...new Set(r)].sort().join('')}`});
+    });
+  }
+  renderFDList();
+  showCandidateKeys();
+}
+
+function showCandidateKeys() {
+  const box  = document.getElementById('candidate-keys-box');
+  const body = document.getElementById('candidate-keys-body');
+  if (!schemaStr || fds.length === 0) { box.style.display = 'none'; return; }
+  const R = new Set(schemaStr);
+  const keys = findCandidateKeys(R, fds);
+  box.style.display = 'block';
+  body.innerHTML = `<div class="step-content">候选键：${keys.map(k=>`<span class="hl-key">${setStr(k)}</span>`).join('，')}</div>`;
+}
+
+// ========== CORE ALGORITHMS ==========
+
+function setStr(s) { return [...s].sort().join(''); }
+function setUnion(a,b) { return new Set([...a,...b]); }
+function setIntersect(a,b) { return new Set([...a].filter(x=>b.has(x))); }
+function setDiff(a,b) { return new Set([...a].filter(x=>!b.has(x))); }
+function isSubset(sub,sup) { return [...sub].every(x=>sup.has(x)); }
+function setsEqual(a,b) { return a.size===b.size && isSubset(a,b); }
+
+function closure(attrs, fdList) {
+  let result = new Set(attrs);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const fd of fdList) {
+      if (isSubset(fd.left, result)) {
+        const before = result.size;
+        fd.right.forEach(c => result.add(c));
+        if (result.size > before) changed = true;
+      }
+    }
+  }
+  return result;
+}
+
+function findCandidateKeys(R, fdList) {
+  const attrs = [...R].sort();
+  const n = attrs.length;
+  const keys = [];
+  for (let size = 1; size <= n; size++) {
+    const combos = combinations(attrs, size);
+    for (const combo of combos) {
+      const cand = new Set(combo);
+      const isSuperOfKey = keys.some(k => isSubset(k, cand));
+      if (isSuperOfKey) continue;
+      const cl = closure(cand, fdList);
+      if (setsEqual(cl, R)) keys.push(cand);
+    }
+  }
+  return keys;
+}
+
+function combinations(arr, k) {
+  if (k === 0) return [[]];
+  if (k > arr.length) return [];
+  const [first, ...rest] = arr;
+  return [
+    ...combinations(rest, k-1).map(c => [first, ...c]),
+    ...combinations(rest, k)
+  ];
+}
+
+// ===== Canonical Cover =====
+function computeCanonicalCover(fdList) {
+  const steps = [];
+
+  // Step 1: 右侧拆单属性
+  let F = [];
+  for (const fd of fdList)
+    for (const c of fd.right)
+      F.push({ left: new Set(fd.left), right: new Set([c]) });
+  steps.push({ label: 'Step 1：右侧拆为单属性', fds: F.map(f=>({...f,left:new Set(f.left),right:new Set(f.right)})) });
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+
+    // Step 2: 去左侧无关属性
+    for (let fi = 0; fi < F.length; fi++) {
+      const fd = F[fi];
+      if (fd.left.size <= 1) continue;
+      for (const c of [...fd.left]) {
+        const newLeft = new Set([...fd.left].filter(x=>x!==c));
+        if (isSubset(fd.right, closure(newLeft, F))) {
+          steps.push({ label: `去左侧无关属性`, note: `${setStr(fd.left)} → ${setStr(fd.right)} 中去除属性 ${c}`, fds: null });
+          fd.left = newLeft;
+          changed = true;
+          break;
+        }
+      }
+    }
+
+    // Step 3: 去冗余FD
+    for (let i = F.length - 1; i >= 0; i--) {
+      const rest = F.filter((_,j)=>j!==i);
+      if (isSubset(F[i].right, closure(F[i].left, rest))) {
+        steps.push({ label: `去冗余FD`, note: `删除 ${setStr(F[i].left)} → ${setStr(F[i].right)}`, fds: null });
+        F.splice(i, 1);
+        changed = true;
+      }
+    }
+  }
+
+  // Step 4: 合并同左侧
+  const merged = new Map();
+  for (const fd of F) {
+    const key = setStr(fd.left);
+    if (!merged.has(key)) merged.set(key, { left: new Set(fd.left), right: new Set() });
+    fd.right.forEach(c => merged.get(key).right.add(c));
+  }
+  const Fc = [...merged.values()];
+  steps.push({ label: 'Step 4：合并同左侧，得到正则覆盖 Fc', fds: Fc });
+  return { Fc, steps };
+}
+
+// ===== 3NF Decompose =====
+function decompose3NF(R, fdList) {
+  const { Fc, steps: canonSteps } = computeCanonicalCover(fdList);
+  const decomp = [];
+  for (const fd of Fc)
+    decomp.push(setUnion(fd.left, fd.right));
+
+  const keys = findCandidateKeys(R, fdList);
+  let hasKey = decomp.some(ri => keys.some(k => isSubset(k, ri)));
+  let addedKey = null;
+  if (!hasKey && keys.length > 0) {
+    addedKey = keys[0];
+    decomp.push(new Set(keys[0]));
+  }
+
+  // 去冗余
+  const final = decomp.filter((ri, i) =>
+    !decomp.some((rj, j) => i !== j && isSubset(ri, rj))
+  );
+  return { Fc, final, addedKey, canonSteps };
+}
+
+// ===== BCNF Decompose =====
+function bcnfDecomposeRec(R, fdList, log) {
+  const attrs = [...R].sort();
+  const n = attrs.length;
+  for (let mask = 1; mask < (1 << n); mask++) {
+    const alpha = new Set(attrs.filter((_,j) => mask >> j & 1));
+    const cl = closure(alpha, fdList);
+    const cl_in_R = setIntersect(cl, R);
+    const extra = setDiff(cl_in_R, alpha);
+    if (extra.size === 0) continue;
+    if (setsEqual(cl_in_R, R)) continue;
+    const R1 = cl_in_R;
+    const R2 = setUnion(alpha, setDiff(R, cl_in_R));
+    log.push({ R: setStr(R), alpha: setStr(alpha), extra: setStr(extra), R1: setStr(R1), R2: setStr(R2) });
+    return [
+      ...bcnfDecomposeRec(R1, fdList, log),
+      ...bcnfDecomposeRec(R2, fdList, log)
+    ];
+  }
+  return [R];
+}
+
+// ===== Preserve =====
+function checkPreserve(alpha, beta, RS, fdList) {
+  let result = new Set(alpha);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const Ri of RS) {
+      const inter = setIntersect(result, Ri);
+      const cl = closure(inter, fdList);
+      const t = setIntersect(cl, Ri);
+      const before = result.size;
+      t.forEach(c => result.add(c));
+      if (result.size > before) changed = true;
+    }
+  }
+  return isSubset(beta, result);
+}
+
+// ========== UI RENDERERS ==========
+
+function computeClosure() {
+  const val = document.getElementById('closure-input').value.toUpperCase().replace(/[^A-Z]/g,'');
+  const el = document.getElementById('closure-result');
+  if (!val || fds.length === 0) { el.innerHTML = ''; return; }
+  const R = new Set(schemaStr);
+  const A = new Set(val);
+
+  // Validate against schema
+  for (const c of A) if (!R.has(c)) {
+    el.innerHTML = `<div class="result-box"><div class="result-body"><span class="hl-bad">属性 ${c} 不在模式 R 中</span></div></div>`;
+    return;
+  }
+
+  // Step-by-step
+  let result = new Set(A);
+  const trace = [];
+  let iter = 0;
+  while (true) {
+    let changed = false;
+    const applied = [];
+    for (const fd of fds) {
+      if (isSubset(fd.left, result) && !isSubset(fd.right, result)) {
+        const added = [...fd.right].filter(c => !result.has(c));
+        if (added.length > 0) {
+          applied.push({ fd, added });
+          added.forEach(c => result.add(c));
+          changed = true;
+        }
+      }
+    }
+    iter++;
+    trace.push({ iter, snapshot: new Set(result), applied });
+    if (!changed) break;
+  }
+
+  const isKey = setsEqual(result, R);
+  el.innerHTML = `<div class="result-box">
+    <div class="result-header">🔍 闭包计算过程：(${val})⁺</div>
+    <div class="result-body">
+      ${trace.map(t => `
+        <div class="result-step">
+          <div class="step-label">第 ${t.iter} 轮</div>
+          <div class="step-content">
+            ${t.applied.length === 0
+              ? `<span class="hl-note">没有新FD可触发，闭包稳定</span>`
+              : t.applied.map(a => `应用 <span class="hl-left">${setStr(a.fd.left)}</span><span class="hl-arrow"> → </span><span class="hl-right">${setStr(a.fd.right)}</span>，新增属性：<span class="hl-key">${a.added.join(', ')}</span>`).join('<br>')}
+            <br>当前 result = <span class="hl-key">{${setStr(t.snapshot)}}</span>
+          </div>
+        </div>`).join('')}
+      <div class="result-step">
+        <div class="step-label">最终结果</div>
+        <div class="step-content">
+          <span class="hl-left">${val}</span><span class="hl-arrow">⁺</span> = <span class="hl-key">{${setStr(result)}}</span>
+          &nbsp;&nbsp;<span class="${isKey ? 'badge badge-ok' : 'badge badge-info'}">${isKey ? '✓ 超键' : '非超键'}</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function runCanonical() {
+  if (fds.length === 0) { alert('请先输入函数依赖'); return; }
+  const { Fc, steps } = computeCanonicalCover(fds);
+  const el = document.getElementById('canonical-result');
+  el.innerHTML = `<div class="result-box">
+    <div class="result-header">✂️ 正则覆盖构造过程</div>
+    <div class="result-body">
+      ${steps.map(s => `
+        <div class="result-step">
+          <div class="step-label">${s.label}</div>
+          <div class="step-content">
+            ${s.note ? `<span class="hl-bad">► ${s.note}</span>` : ''}
+            ${s.fds ? s.fds.map(fd=>`<span class="hl-left">${setStr(fd.left)}</span><span class="hl-arrow"> → </span><span class="hl-right">${setStr(fd.right)}</span>`).join('<br>') : ''}
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function switchBcnfTab(t) {
+  document.getElementById('tab-simple').className = 'tab' + (t==='simple'?' active':'');
+  document.getElementById('tab-decomp').className = 'tab' + (t==='decomp'?' active':'');
+  document.getElementById('bcnf-simple-area').style.display = t==='simple'?'':'none';
+  document.getElementById('bcnf-decomp-area').style.display = t==='decomp'?'':'none';
+}
+
+function runBcnfSimple() {
+  if (!schemaStr || fds.length === 0) { alert('请先输入模式和函数依赖'); return; }
+  const R = new Set(schemaStr);
+  const attrs = [...R].sort();
+  const n = attrs.length;
+  const violations = [];
+  for (let mask = 1; mask < (1 << n); mask++) {
+    const alpha = new Set(attrs.filter((_,j) => mask >> j & 1));
+    const cl = closure(alpha, fds);
+    const cl_in_R = setIntersect(cl, R);
+    const extra = setDiff(cl_in_R, alpha);
+    if (extra.size === 0) continue;
+    if (setsEqual(cl_in_R, R)) continue;
+    violations.push({ alpha, extra, cl_in_R });
+  }
+  const ok = violations.length === 0;
+  document.getElementById('bcnf-simple-result').innerHTML = `<div class="result-box">
+    <div class="result-header">⚖️ BCNF 判定结果：R(${schemaStr})</div>
+    <div class="result-body">
+      <div class="result-step">
+        <div class="step-label">结论</div>
+        <div class="step-content">
+          <span class="${ok?'badge badge-ok':'badge badge-fail'}">${ok?'✓ 满足 BCNF':'✗ 不满足 BCNF'}</span>
+        </div>
+      </div>
+      ${!ok ? `<div class="result-step">
+        <div class="step-label">违反BCNF的函数依赖</div>
+        <div class="step-content">
+          ${violations.map(v=>`<span class="hl-left">${setStr(v.alpha)}</span><span class="hl-arrow"> → </span><span class="hl-bad">${setStr(v.extra)}</span>（${setStr(v.alpha)} 不是超键）`).join('<br>')}
+        </div>
+      </div>` : ''}
+    </div>
+  </div>`;
+}
+
+function runBcnfDecomp() {
+  if (fds.length === 0) { alert('请先输入函数依赖'); return; }
+  const lines = document.getElementById('decomp-input').value.trim().split('\n').filter(l=>l.trim());
+  if (lines.length === 0) { alert('请输入分解后的子模式'); return; }
+  const RS = lines.map(l => new Set(l.trim().toUpperCase().replace(/[^A-Z]/g,'')));
+  const results = [];
+  for (const Ri of RS) {
+    const attrs = [...Ri].sort();
+    const n = attrs.length;
+    let ok = true;
+    const viols = [];
+    for (let mask = 1; mask < (1 << n); mask++) {
+      const alpha = new Set(attrs.filter((_,j) => mask >> j & 1));
+      const cl = closure(alpha, fds);
+      const cl_in_Ri = setIntersect(cl, Ri);
+      const extra = setDiff(cl_in_Ri, alpha);
+      if (extra.size === 0) continue;
+      if (setsEqual(cl_in_Ri, Ri)) continue;
+      ok = false;
+      viols.push({ alpha, extra });
+    }
+    results.push({ Ri, ok, viols });
+  }
+  document.getElementById('bcnf-decomp-result').innerHTML = `<div class="result-box">
+    <div class="result-header">⚖️ 分解后 BCNF 判定</div>
+    <div class="result-body">
+      ${results.map(r=>`<div class="result-step">
+        <div class="step-label">子模式 R(${setStr(r.Ri)})</div>
+        <div class="step-content">
+          <span class="${r.ok?'badge badge-ok':'badge badge-fail'}">${r.ok?'✓ BCNF':'✗ 非BCNF'}</span>
+          ${!r.ok ? '<br>' + r.viols.map(v=>`违反：<span class="hl-left">${setStr(v.alpha)}</span><span class="hl-arrow"> → </span><span class="hl-bad">${setStr(v.extra)}</span>`).join('<br>') : ''}
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function runThreeNF() {
+  if (!schemaStr || fds.length === 0) { alert('请先输入模式和函数依赖'); return; }
+  const R = new Set(schemaStr);
+  const { Fc, final, addedKey, canonSteps } = decompose3NF(R, fds);
+  const el = document.getElementById('threenf-result');
+  el.innerHTML = `<div class="result-box">
+    <div class="result-header">🔀 3NF 分解过程</div>
+    <div class="result-body">
+      <div class="result-step">
+        <div class="step-label">Step 1：正则覆盖 Fc</div>
+        <div class="step-content">
+          ${Fc.map(fd=>`<span class="hl-left">${setStr(fd.left)}</span><span class="hl-arrow"> → </span><span class="hl-right">${setStr(fd.right)}</span>`).join('<br>')}
+        </div>
+      </div>
+      <div class="result-step">
+        <div class="step-label">Step 2：为每个 FD 构造子模式</div>
+        <div class="step-content">
+          ${Fc.map(fd=>`R(<span class="hl-rel">${setStr(setUnion(fd.left,fd.right))}</span>)`).join('，')}
+        </div>
+      </div>
+      ${addedKey ? `<div class="result-step">
+        <div class="step-label">Step 3：加入候选键关系</div>
+        <div class="step-content">加入 R(<span class="hl-key">${setStr(addedKey)}</span>)，确保无损连接</div>
+      </div>` : ''}
+      <div class="result-step">
+        <div class="step-label">Step 4：去除冗余子模式</div>
+        <div class="step-content">（删除被其他子模式包含的关系）</div>
+      </div>
+      <div class="result-step">
+        <div class="step-label">✅ 最终3NF分解结果</div>
+        <div class="step-content">
+          ρ = { ${final.map(r=>`<span class="hl-rel">R(${setStr(r)})</span>`).join(', ')} }
+          <br><span class="hl-note">保证：无损连接 ✓  函数依赖保持 ✓</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function runBcnfDecomposition() {
+  if (!schemaStr || fds.length === 0) { alert('请先输入模式和函数依赖'); return; }
+  const R = new Set(schemaStr);
+  const log = [];
+  const result = bcnfDecomposeRec(R, fds, log);
+  const el = document.getElementById('bcnf-decomp-main-result');
+  el.innerHTML = `<div class="result-box">
+    <div class="result-header">⚡ BCNF 分解过程</div>
+    <div class="result-body">
+      ${log.length === 0 ? `<div class="result-step"><div class="step-content"><span class="hl-good">R 本身已满足 BCNF，无需分解</span></div></div>` :
+        log.map((l,i) => `<div class="result-step">
+          <div class="step-label">第 ${i+1} 次分解</div>
+          <div class="step-content">
+            R(<span class="hl-rel">${l.R}</span>) 中，
+            <span class="hl-left">${l.alpha}</span><span class="hl-arrow"> → </span><span class="hl-bad">${l.extra}</span> 违反BCNF
+            <br>→ R1(<span class="hl-rel">${l.R1}</span>)，R2(<span class="hl-rel">${l.R2}</span>)
+          </div>
+        </div>`).join('')}
+      <div class="result-step">
+        <div class="step-label">✅ 最终BCNF分解结果</div>
+        <div class="step-content">
+          ρ = { ${result.map(r=>`<span class="hl-rel">R(${setStr(r)})</span>`).join(', ')} }
+          <br><span class="hl-note">保证：无损连接 ✓  （注意：可能不保持函数依赖）</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function runPreserve() {
+  if (fds.length === 0) { alert('请先输入函数依赖'); return; }
+  const lines = document.getElementById('preserve-decomp').value.trim().split('\n').filter(l=>l.trim());
+  if (lines.length === 0) { alert('请输入分解后的子模式'); return; }
+  const RS = lines.map(l => new Set(l.trim().toUpperCase().replace(/[^A-Z]/g,'')));
+  const el = document.getElementById('preserve-result');
+  const rows = fds.map(fd => {
+    const ok = checkPreserve(fd.left, fd.right, RS, fds);
+    return { fd, ok };
+  });
+  const allOk = rows.every(r => r.ok);
+  el.innerHTML = `<div class="result-box">
+    <div class="result-header">🔗 函数依赖保持检验</div>
+    <div class="result-body">
+      <div class="result-step">
+        <div class="step-label">子模式集合</div>
+        <div class="step-content">${RS.map(r=>`R(<span class="hl-rel">${setStr(r)}</span>)`).join('，')}</div>
+      </div>
+      ${rows.map(r=>`<div class="result-step">
+        <div class="step-label"><span class="hl-left">${setStr(r.fd.left)}</span><span class="hl-arrow"> → </span><span class="hl-right">${setStr(r.fd.right)}</span></div>
+        <div class="step-content"><span class="${r.ok?'badge badge-ok':'badge badge-fail'}">${r.ok?'✓ 保持':'✗ 不保持'}</span></div>
+      </div>`).join('')}
+      <div class="result-step">
+        <div class="step-label">结论</div>
+        <div class="step-content"><span class="${allOk?'badge badge-ok':'badge badge-fail'}">${allOk?'✓ 所有函数依赖均被保持':'✗ 存在未被保持的函数依赖'}</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// Init
+loadExample(2);
+</script>
+</body>
+</html>
