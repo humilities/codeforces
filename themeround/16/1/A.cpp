@@ -1,55 +1,48 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-using ll = long long;
 
-int luc(int n) {
-  int mm = 0, mn = 9;
+int luc(int x) {
+  int mn = 9, mx = 0;
 
-  while (n) {
-    int val = n % 10;
-    mm = max(mm, val);
-    mn = min(mn, val);
-
-    n /= 10;
+  while (x > 0) {
+    int d = x % 10;
+    mn = min(mn, d);
+    mx = max(mx, d);
+    x /= 10;
   }
 
-  return mm - mn;
-}
-
-void solve() {
-  int l, r;
-  cin >> l >> r;
-
-  if (r - l > 100) {
-    int k = (l / 100) * 100 + 90;
-    cout << k << "\n";
-  } else {
-    int na = 0;
-    int ans = 0;
-
-    for (int i = l; i <= r; i++) {
-      int num = luc(i);
-
-      if (num > na) {
-        na = num;
-        ans = i;
-      }
-    }
-
-    cout << ans << "\n";
-  }
+  return mx - mn;
 }
 
 int main() {
-  ios_base::sync_with_stdio(false);
-  cin.tie(NULL);
+  ios::sync_with_stdio(false);
+  cin.tie(nullptr);
 
   int t;
   cin >> t;
 
-  while (t--)
-    solve();
+  while (t--) {
+    int l, r;
+    cin >> l >> r;
+
+    int ans = l;
+    int bes = luc(l);
+
+    for (int x = l; x <= r && x <= l + 100; x++) {
+      int cur = luc(x);
+
+      if (cur > bes) {
+        bes = cur;
+        ans = x;
+      }
+
+      if (bes == 9)
+        break;
+    }
+
+    cout << ans << '\n';
+  }
 
   return 0;
 }

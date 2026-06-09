@@ -16,7 +16,7 @@ void solve() {
 
   for (int i = 1; i < n; i++) {
     if ((a[i] & 1) != (a[i - 1] & 1))
-      cur += a[i];
+      cur = max(cur + a[i], a[i]);
     else
       cur = a[i];
 
