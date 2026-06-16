@@ -5,10 +5,9 @@ using ll = long long;
 
 void solve() {
   ll a;
-  int n = 2;
-  int c, b;
+  int n, b, c;
 
-  cin >> a;
+  cin >> a >> n;
   cin >> b >> c;
 }
 
