@@ -3,7 +3,10 @@
 using namespace std;
 using ll = long long;
 
-void solve() {}
+void solve() {
+  int n, a, b, k;
+  cin >> n >> a >> b >> k;
+}
 
 int main() {
   ios_base::sync_with_stdio(false);
