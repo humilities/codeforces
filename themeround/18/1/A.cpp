@@ -24,8 +24,12 @@ void solve() {
     }
   }
 
-  if (a[n - 1] == 0 && a[n - 2] == 0)
+  if (a[n - 1] == 0 && a[n - 2] == 0) {
     cout << "YES" << "\n";
+    return;
+  }
+
+  cout << "NO" << "\n";
 }
 
 int main() {
