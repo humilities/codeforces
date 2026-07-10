@@ -6,6 +6,8 @@ using ll = long long;
 void solve() {
   int n;
   cin >> n;
+
+  cout << n + (n + 5) / 6;
 }
 
 int main() {
