@@ -1,37 +1,29 @@
 #include <bits/stdc++.h>
 
-#define lin(i, a, b) for (int i = (a); i < (b); i++)
 using namespace std;
 using ll = long long;
 
-void solve(string s) {
-    int n=s.length();
-    ll ans=0;
-    vector<ll> cnt(26,0),su(26,0);
+void solve() {
+  int n;
+  cin >> n;
 
-    lin(i,0,n){
-        int num=s[i]-'a';
+  vector<int> a(n);
+  for (int i = 0; i < n; i++)
+    cin >> a[i];
 
-        if(cnt[num]) ans+=cnt[num]*(i+1)-su[num];
-
-        cnt[num]++;
-        su[num]+=i;
-    }
-
-    cout<<ans<<"\n";
+  for (int i = 0; i < n; i++)
+    cout << a[i] << "\n";
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+  ios_base::sync_with_stdio(false);
+  cin.tie(NULL);
 
-    //int t;
-    //cin >> t;
+  int t;
+  cin >> t;
 
-    //while (t--)
-    string s;
-    while(cin>>s)
-        solve(s);
+  while (t--)
+    solve();
 
-    return 0;
+  return 0;
 }
