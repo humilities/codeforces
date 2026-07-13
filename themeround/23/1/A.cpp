@@ -14,7 +14,7 @@ void solve() {
   sort(a.begin(), a.end());
 
   vector<int> pair;
-  for (int i = 0; i < n;) {
+  for (int i = 0; i < n - 1;) {
     if (a[i] == a[i + 1]) {
       pair.push_back(i);
       i += 2;
@@ -35,8 +35,8 @@ void solve() {
     return;
   }
 
-  int idx = pair[0];
-  int val = a[idx];
+  ll idx = pair[0];
+  ll val = a[idx];
 
   vector<int> rem;
   for (int i = 0; i < n; i++) {
@@ -50,7 +50,7 @@ void solve() {
   //   cout << rem[i] << " ";
   // cout << "\n";
 
-  int c = 0, d = 0;
+  ll c = 0, d = 0;
   for (int i = 0; i < rem.size() - 1; i++) {
     c = rem[i];
     d = rem[i + 1];
