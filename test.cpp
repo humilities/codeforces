@@ -4,15 +4,9 @@ using namespace std;
 using ll = long long;
 
 void solve() {
-  int n;
-  cin >> n;
-
-  vector<int> a(n);
-  for (int i = 0; i < n; i++)
-    cin >> a[i];
-
-  for (int i = 0; i < n; i++)
-    cout << a[i] << "\n";
+  int x;
+  if (x)
+    cout << "who am i" << "\n";
 }
 
 int main() {
